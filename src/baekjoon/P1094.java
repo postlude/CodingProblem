@@ -70,15 +70,23 @@ public class P1094 {
 		do {
 			int nextLength = currentLength / 2;
 			
-			if(nextLength > calcSumOfStickList(stickList)) {
-				currentLength = nextLength;
-			}else if(nextLength == targetLength) {
-				stickList.add(nextLength);
-				break;
-			}else {
-				stickList.add(nextLength);
-				currentLength = nextLength;
+			//리스트에 하나도 추가된 길이가 없으면 currentLength와 targetLength 비교
+			if(stickList.size() == 0){
+				if(targetLength == currentLength) {
+					stickList.add(currentLength);
+					break;
+				}else if(targetLength > currentLength) {
+					stickList.add(currentLength);
+				}
+			}else{//리스트에 하나라도 추가된 길이가 있으면 합계와 targetLength 비교
+				if(targetLength == calcSumOfStickList(stickList)) {
+					stickList.add(currentLength);
+					break;
+				}else if(targetLength > calcSumOfStickList(stickList)) {
+					stickList.add(currentLength);
+				}
 			}
+			currentLength = nextLength;
 		}while(calcSumOfStickList(stickList) != targetLength);
 		
 		return stickList.size();
