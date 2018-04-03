@@ -1,5 +1,7 @@
 package baekjoon.algorithmcourse;
 
+import java.util.Scanner;
+
 /**
  * 문제
  * 폴리오미노란 크기가 1×1인 정사각형을 여러 개 이어서 붙인 도형이며, 다음과 같은 조건을 만족해야 한다.
@@ -55,10 +57,217 @@ package baekjoon.algorithmcourse;
  * 7
  * 
  */
+//테트로미노 가지수 = 19
+//가능한 가지수 = 19*N*M = 4750000 이므로 모든 경우에 수에 대하여 다 해본다
+//시간복잡도 : O(NM)
 public class P14500 {
-
 	public static void main(String[] args) {
+		//input
+		Scanner scan = new Scanner(System.in);
+		int N = scan.nextInt();
+		int M = scan.nextInt();
 		
+		int[][] tetrominoAry = new int[N][M];
+		
+		for(int n=0; n<N; n++) {
+			for(int m=0; m<M; m++) {
+				tetrominoAry[n][m] = scan.nextInt();
+			}
+		}
+		scan.close();
+		
+		P14500 p14500 = new P14500();
+		System.out.println(p14500.calcMaxSum(N, M, tetrominoAry));
 	}
-
+	
+	public int calcMaxSum(int N, int M, int[][] tetrominoAry) {
+		int maxSum = 0;
+		
+		for(int n=0; n<N; n++) {
+			for(int m=0; m<M; m++) {
+				//ㅁㅁㅁㅁ
+				if(m+3 < M) { 
+					int sum = tetrominoAry[n][m] + tetrominoAry[n][m+1] + tetrominoAry[n][m+2] + tetrominoAry[n][m+3];
+					if(sum > maxSum) {
+						maxSum = sum;
+					}
+				}
+				
+				//ㅁ
+				//ㅁ
+				//ㅁ
+				//ㅁ
+				if(n+3 < N) { 
+					int sum = tetrominoAry[n][m] + tetrominoAry[n+1][m] + tetrominoAry[n+2][m] + tetrominoAry[n+3][m];
+					if(sum > maxSum) {
+						maxSum = sum;
+					}
+				}
+				
+				//ㅁㅁ
+				//ㅁㅁ
+				if(n+1<N && m+1<M) { 
+					int sum = tetrominoAry[n][m] + tetrominoAry[n+1][m] + tetrominoAry[n][m+1] + tetrominoAry[n+1][m+1];
+					if(sum > maxSum) {
+						maxSum = sum;
+					}
+				}
+				
+				//ㅁ
+				//ㅁ
+				//ㅁㅁ
+				if(n+2<N && m+1<M) { 
+					int sum = tetrominoAry[n][m] + tetrominoAry[n+1][m] + tetrominoAry[n+2][m] + tetrominoAry[n+2][m+1];
+					if(sum > maxSum) {
+						maxSum = sum;
+					}
+				}
+				
+				//   ㅁ
+				//ㅁㅁㅁ
+				if(n-1>=0 && m+2<M) { 
+					int sum = tetrominoAry[n][m] + tetrominoAry[n][m+1] + tetrominoAry[n][m+2] + tetrominoAry[n-1][m+2];
+					if(sum > maxSum) {
+						maxSum = sum;
+					}
+				}
+				
+				//ㅁ ㅁ
+				//  ㅁ 
+				//  ㅁ 
+				if(n+2<N && m+1<M) { 
+					int sum = tetrominoAry[n][m] + tetrominoAry[n][m+1] + tetrominoAry[n+1][m+1] + tetrominoAry[n+2][m+1];
+					if(sum > maxSum) {
+						maxSum = sum;
+					}
+				}
+				
+				//ㅁㅁㅁ
+				//ㅁ
+				if(n+1<N && m+2<M) { 
+					int sum = tetrominoAry[n][m] + tetrominoAry[n][m+1] + tetrominoAry[n][m+2] + tetrominoAry[n+1][m];
+					if(sum > maxSum) {
+						maxSum = sum;
+					}
+				}
+				
+				//  ㅁ
+				//  ㅁ
+				//ㅁ ㅁ
+				if(n-2>=0 && m+1<M) { 
+					int sum = tetrominoAry[n][m] + tetrominoAry[n][m+1] + tetrominoAry[n-1][m+1] + tetrominoAry[n-2][m+1];
+					if(sum > maxSum) {
+						maxSum = sum;
+					}
+				}
+				
+				//ㅁㅁㅁ
+				//   ㅁ
+				if(n+1<N && m+2<M) { 
+					int sum = tetrominoAry[n][m] + tetrominoAry[n][m+1] + tetrominoAry[n][m+2] + tetrominoAry[n+1][m+2];
+					if(sum > maxSum) {
+						maxSum = sum;
+					}
+				}
+				
+				//ㅁ ㅁ
+				//ㅁ
+				//ㅁ
+				if(n+2<N && m+1<M) { 
+					int sum = tetrominoAry[n][m] + tetrominoAry[n][m+1] + tetrominoAry[n+1][m] + tetrominoAry[n+2][m];
+					if(sum > maxSum) {
+						maxSum = sum;
+					}
+				}
+				
+				//ㅁ
+				//ㅁㅁㅁ
+				if(n+1<N && m+2<M) { 
+					int sum = tetrominoAry[n][m] + tetrominoAry[n+1][m] + tetrominoAry[n+1][m+1] + tetrominoAry[n+1][m+2];
+					if(sum > maxSum) {
+						maxSum = sum;
+					}
+				}
+				
+				//ㅁ
+				//ㅁ ㅁ
+				//  ㅁ
+				if(n+2<N && m+1<M) { 
+					int sum = tetrominoAry[n][m] + tetrominoAry[n+1][m] + tetrominoAry[n+1][m+1] + tetrominoAry[n+2][m+1];
+					if(sum > maxSum) {
+						maxSum = sum;
+					}
+				}
+				
+				//  ㅁ ㅁ
+				//ㅁ ㅁ
+				if(n-1>=0 && m+2<M) { 
+					int sum = tetrominoAry[n][m] + tetrominoAry[n][m+1] + tetrominoAry[n-1][m+1] + tetrominoAry[n-1][m+2];
+					if(sum > maxSum) {
+						maxSum = sum;
+					}
+				}
+				
+				//  ㅁ
+				//ㅁ ㅁ
+				//ㅁ
+				if(n-1>=0 && n+1<N && m+1<M) { 
+					int sum = tetrominoAry[n][m] + tetrominoAry[n][m+1] + tetrominoAry[n-1][m+1] + tetrominoAry[n+1][m];
+					if(sum > maxSum) {
+						maxSum = sum;
+					}
+				}
+				
+				//ㅁ ㅁ
+				//  ㅁ ㅁ
+				if(n+1<N && m+2<M) { 
+					int sum = tetrominoAry[n][m] + tetrominoAry[n][m+1] + tetrominoAry[n+1][m+1] + tetrominoAry[n+1][m+2];
+					if(sum > maxSum) {
+						maxSum = sum;
+					}
+				}
+				
+				//ㅁ ㅁ ㅁ
+				//  ㅁ
+				if(n+1<N && m+2<M) { 
+					int sum = tetrominoAry[n][m] + tetrominoAry[n][m+1] + tetrominoAry[n][m+2] + tetrominoAry[n+1][m+1];
+					if(sum > maxSum) {
+						maxSum = sum;
+					}
+				}
+				
+				//ㅁ
+				//ㅁㅁ
+				//ㅁ
+				if(n+2<N && m+1<M) { 
+					int sum = tetrominoAry[n][m] + tetrominoAry[n+1][m] + tetrominoAry[n+2][m] + tetrominoAry[n+1][m+1];
+					if(sum > maxSum) {
+						maxSum = sum;
+					}
+				}
+				
+				//  ㅁ
+				//ㅁ ㅁ ㅁ
+				if(n-1>=0 && m+2<M) { 
+					int sum = tetrominoAry[n][m] + tetrominoAry[n][m+1] + tetrominoAry[n][m+2] + tetrominoAry[n-1][m+1];
+					if(sum > maxSum) {
+						maxSum = sum;
+					}
+				}
+				
+				//  ㅁ
+				//ㅁ ㅁ
+				//  ㅁ
+				if(n-1>=0 && n+1<N && m+1<M) { 
+					int sum = tetrominoAry[n][m] + tetrominoAry[n][m+1] + tetrominoAry[n-1][m+1] + tetrominoAry[n+1][m+1];
+					if(sum > maxSum) {
+						maxSum = sum;
+					}
+				}
+				
+			}
+		}
+		
+		return maxSum;
+	}
 }
