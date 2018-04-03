@@ -39,14 +39,53 @@ public class P1748 {
 			inputDigit++;
 			n /= 10;
 		}while(n > 0);
-//		System.out.println(count);
 		
+		/*
+		 * 한 자리수부터 입력 수의 자리수보다 1 작은 자리수
+		 * 9 * 10의 (k-1)제곱 * k [1 <= k <= N-1] 까지 누적
+		 * 
+		 * 입력 수의 자리수
+		 * (N - 10의 (입력수의 자리수-1)제곱  + 1) * 입력수의 자리수
+		 */
 		
-		int resultDigit = 0;
-		int prevCount = 1;
-		for(int i=0; i<inputDigit-1; i++) {
-			prevCount *= 10;
+		//입력 수의 자리수보다 한자리 더 작은 수까지의 자리수 총합
+		int prevDigitCount = 0;
+		//10의 제곱승 계산을 위한 변수
+		int prevDigitpower = 1;
+		//입력 수와 같은 자리수를 계산하기 위한 10의 제곱승 변수 
+		int presentDigitpower = 1;
+		for(int i=1; i<=inputDigit-1; i++) {
+			presentDigitpower *= 10;
+			if(i > 1) {
+				prevDigitpower *= 10;
+			}
+			
+			prevDigitCount += (9 * prevDigitpower * i);
 		}
+		int presentDigitCount = (N - presentDigitpower + 1) * inputDigit;
+		
+		int resultDigit = prevDigitCount + presentDigitCount;
+		System.out.println(resultDigit);
 	}
-
 }
+
+
+
+
+//정답 코드
+/*import java.util.*;
+public class Main {
+    public static void main(String args[]) {
+        Scanner sc = new Scanner(System.in);
+        int n = sc.nextInt();
+        long ans = 0;
+        for (int start=1, len=1; start<=n; start*=10, len++) {
+            int end = start*10-1;
+            if (end > n) {
+                end = n;
+            }
+            ans += (long)(end - start + 1) * len;
+        }
+        System.out.println(ans);
+    }
+}*/
