@@ -3,7 +3,6 @@ package baekjoon.algorithmcourse;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Scanner;
-import java.util.SortedSet;
 
 /**
  * 단어 수학
@@ -77,23 +76,65 @@ public class P1339 {
 		int N = Integer.parseInt(scan.nextLine());
 		
 		String[] wordAry = new String[N];
+		
+		//입력 단어들의 알파벳을 set에 저장
+		HashSet<Character> alphabetSet = new HashSet<>();
+
 		for(int index=0; index<N; index++) {
 			wordAry[index] = scan.nextLine();
-		}
-		scan.close();
-
-		HashSet<Character> alphabetSet = new HashSet<>();
-		for(int wordIndex=0; wordIndex<N; wordIndex++) {
-			char[] alphaAry = wordAry[wordIndex].toCharArray();
+			
+			char[] alphaAry = wordAry[index].toCharArray();
 			for(int alphaIndex=0; alphaIndex<alphaAry.length; alphaIndex++) {
 				alphabetSet.add(alphaAry[alphaIndex]);
 			}
 		}
+		scan.close();
+		//input end
+
 		
-		Character[] alphaAry = (Character[])alphabetSet.toArray();
-		Arrays.sort(alphaAry);
+		Character[] alphaAry = alphabetSet.toArray(new Character[0]);
+		P1339 p1339 = new P1339();
+		
+		int[] numAry = new int[alphaAry.length];
+		for(int index=0; index<numAry.length; index++) {
+			numAry[index] = 9 - index;
+		}
+		Arrays.sort(numAry);
+		
+		int maxSum = -1;
+		do {
+			int sum = p1339.calcSum(wordAry, alphaAry, numAry);
+			if(sum > maxSum) {
+				maxSum = sum;
+			}
+		}while(p1339.nextPermutation(numAry));
+		
+		System.out.println(maxSum);
 	}
 
+	public int calcSum(String[] wordAry, Character[] alphaAry, int[] numAry) {
+		int[] alphaNumAry = new int[256];
+		
+		for(int index=0; index<alphaAry.length; index++) {
+			alphaNumAry[alphaAry[index]] = numAry[index]; 
+		}
+		
+		
+		int sum = 0;
+		
+		for(String word : wordAry) {
+			char[] charAry = word.toCharArray();
+			int calcNum = 0;
+			
+			for(char alpha : charAry) {
+				calcNum = calcNum*10 + alphaNumAry[alpha];
+			}
+			
+			sum += calcNum;
+		}
+		
+		return sum;
+	}
 	
 	public boolean nextPermutation(int[] permutationArray) {
 		int sizeOfAry = permutationArray.length;
