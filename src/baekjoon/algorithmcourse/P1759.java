@@ -1,11 +1,16 @@
 package baekjoon.algorithmcourse;
 
+import java.util.Arrays;
+import java.util.Scanner;
+
 /**
  * 암호 만들기
  * 
  * 문제
- * 바로 어제 최백준 조교가 방 열쇠를 주머니에 넣은 채 깜빡하고 서울로 가 버리는 황당한 상황에 직면한 조교들은, 702호에 새로운 보안 시스템을 설치하기로 하였다. 이 보안 시스템은 열쇠가 아닌 암호로 동작하게 되어 있는 시스템이다.
- * 암호는 서로 다른 L개의 알파벳 소문자들로 구성되며 최소 한 개의 모음과 최소 두 개의 자음으로 구성되어 있다고 알려져 있다. 또한 정렬된 문자열을 선호하는 조교들의 성향으로 미루어 보아 암호를 이루는 알파벳이 암호에서 증가하는 순서로 배열되었을 것이라고 추측된다.
+ * 바로 어제 최백준 조교가 방 열쇠를 주머니에 넣은 채 깜빡하고 서울로 가 버리는 황당한 상황에 직면한 조교들은, 702호에 새로운 보안 시스템을 설치하기로 하였다.
+ * 이 보안 시스템은 열쇠가 아닌 암호로 동작하게 되어 있는 시스템이다.
+ * 암호는 서로 다른 L개의 알파벳 소문자들로 구성되며 최소 한 개의 모음과 최소 두 개의 자음으로 구성되어 있다고 알려져 있다.
+ * 또한 정렬된 문자열을 선호하는 조교들의 성향으로 미루어 보아 암호를 이루는 알파벳이 암호에서 증가하는 순서로 배열되었을 것이라고 추측된다.
  * 즉, abc는 가능성이 있는 암호이지만 bac는 그렇지 않다.
  * 새 보안 시스템에서 조교들이 암호로 사용했을 법한 문자의 종류는 C가지가 있다고 한다. 이 알파벳을 입수한 민식, 영식 형제는 조교들의 방에 침투하기 위해 암호를 추측해 보려고 한다.
  * C개의 문자들이 모두 주어졌을 때, 가능성 있는 암호들을 모두 구하는 프로그램을 작성하시오.
@@ -39,8 +44,63 @@ package baekjoon.algorithmcourse;
  * 
  */
 public class P1759 {
-
 	public static void main(String[] args) {
+		Scanner scan = new Scanner(System.in);
 		
+		int L = scan.nextInt();
+		int C = scan.nextInt();
+		
+//		scan.nextLine();
+//		String input = scan.nextLine();
+		String[] word = new String[C];
+		for(int index=0; index<C; index++) {
+			word[index] = scan.next();
+		}
+		scan.close();
+		// input end
+		
+//		String[] word = input.split(" ");
+		
+		Arrays.sort(word);
+		P1759 p1759 = new P1759();
+		p1759.makePassword(L, word, 0, "");
+	}
+	
+	public boolean isCollectPwd(String password) {
+		// 모음 개수
+		int vowelNum = 0;
+		// 자음 개수
+		int consonantNum = 0;
+		
+		for(char letter : password.toCharArray()) {
+			if(letter=='a' || letter=='e' || letter=='i' || letter=='o' || letter=='u') {
+				vowelNum++;
+			}else {
+				consonantNum++;
+			}
+		}
+		
+		if(vowelNum>=1 && consonantNum>=2) {
+			return true;
+		}else {
+			return false;
+		}
+	}
+	
+	public void makePassword(int L, String[] word, int wordIndex, String password) {
+		if(password.length() == L) {
+			if(isCollectPwd(password)) {
+				System.out.println(password);
+			}
+			return;
+		}else if(wordIndex >= word.length) {
+			return;
+		}
+
+		// word[wordIndex] 문자를 사용하는 경우
+		makePassword(L, word, wordIndex+1, password+word[wordIndex]);
+		
+		// word[wordIndex] 문자를 사용하지 않는 경우
+		makePassword(L, word, wordIndex+1, password);
 	}
 }
