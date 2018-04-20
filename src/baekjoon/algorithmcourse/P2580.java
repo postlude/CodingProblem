@@ -92,6 +92,14 @@ public class P2580 {
 		}
 	}
 	
+	/**
+	 * num이 (row, col) 위치에 넣을 수 있는지 판단하는 메소드
+	 * 넣으려고 하는 num이 이미 있는지만 검사하므로 0(빈칸)이 있어도 true가 나옴
+	 * @param row
+	 * @param col
+	 * @param num
+	 * @return t/f
+	 */
 	public boolean isCollect(int row, int col, int num) {
 		// 가로
 		if(P2580.CHECK_ROW[row][num-1]) {
@@ -111,12 +119,15 @@ public class P2580 {
 		return true;
 	}
 	
+	// point는 0에서 시작해서 80까지 증가
+	// (0, 0) -> (0, 8) -> (1, 0) -> (1, 8) -> ... (8, 8)를 나타내는 int 값
 	public boolean solveSudoku(int point) {
 		if(point == 81) {
 			printArray();
 			return true;
 		}
 		
+		// point로 해당 위치 계산
 		int row = point / 9;
 		int col = point % 9;
 		
@@ -131,6 +142,8 @@ public class P2580 {
 				P2580.CHECK_COL[num-1][col] = true;
 				P2580.CHECK_SQUARE[row/3*3+col/3][num-1] = true;
 				
+				// 다음 점으로 이동해서 진행하다가 false가 나오는 경우는 이전에 바꾼 값이 잘못되었다는 의미이므로
+				// 현재 값을 원상복귀시키고 다음 num 값으로 넘어간다
 				if(!solveSudoku(point+1)) {
 					P2580.SUDOKU[row][col] = 0;
 					P2580.CHECK_ROW[row][num-1] = false;
