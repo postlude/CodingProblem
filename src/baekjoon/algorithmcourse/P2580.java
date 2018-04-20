@@ -111,38 +111,91 @@ public class P2580 {
 		return true;
 	}
 	
-	public void solveSudoku(int row) {
-		if(row == 9) {
-			if(P2580.NUM_OF_ZERO == 0) {
-				printArray();
-				System.out.println("--------------------------");
-			}
-			return;
+	public boolean solveSudoku(int point) {
+		if(point == 81) {
+			printArray();
+			return true;
 		}
 		
+		int row = point / 9;
+		int col = point % 9;
 		
-		for(int col=0; col<9; col++) {
-			if(P2580.SUDOKU[row][col] != 0) {
-				continue;
-			}
+		if(P2580.SUDOKU[row][col] != 0) {
+			return solveSudoku(point+1);
+		}
 		
-			for(int num=1; num<=9; num++) {
-				if(isCollect(row, col, num)) {
-					P2580.SUDOKU[row][col] = num;
-					P2580.CHECK_ROW[row][num-1] = true;
-					P2580.CHECK_COL[num-1][col] = true;
-					P2580.CHECK_SQUARE[row/3*3+col/3][num-1] = true;
-					P2580.NUM_OF_ZERO--;
-					
-					solveSudoku(row+1);
-					
+		for(int num=1; num<=9; num++) {
+			if(isCollect(row, col, num)) {
+				P2580.SUDOKU[row][col] = num;
+				P2580.CHECK_ROW[row][num-1] = true;
+				P2580.CHECK_COL[num-1][col] = true;
+				P2580.CHECK_SQUARE[row/3*3+col/3][num-1] = true;
+				
+				if(!solveSudoku(point+1)) {
 					P2580.SUDOKU[row][col] = 0;
 					P2580.CHECK_ROW[row][num-1] = false;
 					P2580.CHECK_COL[num-1][col] = false;
 					P2580.CHECK_SQUARE[row/3*3+col/3][num-1] = false;
-					P2580.NUM_OF_ZERO++;
 				}
 			}
 		}
+		return false;
 	}
 }
+
+
+
+// 정답 코드
+/*import java.util.*;
+
+public class Main {
+    public static final int n = 9;
+    public static int square(int x, int y) {
+        return (x/3)*3+(y/3);
+    }
+    public static boolean go(int[][] a, boolean[][][] c, int z) {
+        if (z == 81) {
+            for (int i=0; i<n; i++) {
+                for (int j=0; j<n; j++) {
+                    System.out.print(a[i][j] + " ");
+                }
+                System.out.println();
+            }
+            return true;
+        }
+        int x = z/n;
+        int y = z%n;
+        if (a[x][y] != 0) {
+            return go(a, c, z+1);
+        } else {
+            for (int i=1; i<=9; i++) {
+                if (!c[0][x][i] && !c[1][y][i] && !c[2][square(x,y)][i]) {
+                    c[0][x][i] = c[1][y][i] = c[2][square(x,y)][i] = true;
+                    a[x][y] = i;
+                    if (go(a, c, z+1)) {
+                        return true;
+                    }
+                    a[x][y] = 0;
+                    c[0][x][i] = c[1][y][i] = c[2][square(x,y)][i] = false;
+                }
+            }
+        }
+        return false;
+    }
+    public static void main(String args[]) {
+        Scanner sc = new Scanner(System.in);
+        int[][] a = new int[n][n];
+        boolean[][][] c = new boolean[3][n][10];
+        for (int i=0; i<n; i++) {
+            for (int j=0; j<n; j++) {
+                a[i][j] = sc.nextInt();
+                if (a[i][j] != 0) {
+                    c[0][i][a[i][j]] = true;
+                    c[1][j][a[i][j]] = true;
+                    c[2][square(i,j)][a[i][j]] = true;
+                }
+            }
+        }
+        go(a, c, 0);
+    }
+}*/
