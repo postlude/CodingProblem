@@ -1,5 +1,6 @@
 package baekjoon.algorithmcourse;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
 
@@ -28,13 +29,20 @@ import java.util.Scanner;
  * 
  */
 public class P1987 {
-	static int MAX_ALPHA = 0;
+	static int R;
+	static int C;
+	static int MAX_PATH = 0;
 	static char[][] BOARD;
+	static ArrayList<Character> PATH = new ArrayList<>();
+	/**
+	 * 동일한 index의 PATH에 있는 문자가 상하좌우 순서로 이동이 가능한지를 저장하고 있는 리스트 
+	 */
+	static ArrayList<boolean[]> POSSIBLE_DIRECTION = new ArrayList<>();
 	
 	public static void main(String[] args) {
 		Scanner scan = new Scanner(System.in);
-		int R = scan.nextInt();
-		int C = scan.nextInt();
+		P1987.R = scan.nextInt();
+		P1987.C = scan.nextInt();
 		P1987.BOARD = new char[R][C];
 		
 		for(int row=0; row<R; row++) {
@@ -44,9 +52,126 @@ public class P1987 {
 		scan.close();
 		
 		
-//		System.out.println(Arrays.toString(P1987.BOARD[0]));
-//		System.out.println(Arrays.toString(P1987.BOARD[1]));
+		P1987 p1987 = new P1987();
+		// (0, 0)에 있는 문자 미리 추가
+		P1987.PATH.add(P1987.BOARD[0][0]);
+		P1987.POSSIBLE_DIRECTION.add(new boolean[4]);
+		
+		p1987.calcMaxPath(0, 0, 0);
+		System.out.println(P1987.MAX_PATH);
 	}
 
+	public void decidePossibleDirection(int row, int col, int index) {
+		// 해당 index에 있는 boolean 배열을 true로 초기화
+		for(int aryIndex=0; aryIndex<4; aryIndex++) {
+			P1987.POSSIBLE_DIRECTION.get(index)[aryIndex] = true;
+		}
+		
+		for(char letter : P1987.PATH) {
+			// 순서대로 현재 위치에서 상하좌우로 이동이 가능한지를 검사
+			if(row-1<0 || letter==P1987.BOARD[row-1][col]) {
+				P1987.POSSIBLE_DIRECTION.get(index)[0] = false;
+			}
+			if(row+1>=P1987.R || letter==P1987.BOARD[row+1][col]) {
+				P1987.POSSIBLE_DIRECTION.get(index)[1] = false;
+			}
+			if(col-1<0 || letter==P1987.BOARD[row][col-1]) {
+				P1987.POSSIBLE_DIRECTION.get(index)[2] = false;
+			}
+			if(col+1>=P1987.C || letter==P1987.BOARD[row][col+1]) {
+				P1987.POSSIBLE_DIRECTION.get(index)[3] = false;
+			}
+		}
+	}
 	
+	public void calcMaxPath(int row, int col, int index) {
+		// 상하좌우 이동할 수 없는 경우 종료
+		decidePossibleDirection(row, col, index);
+		if(!P1987.POSSIBLE_DIRECTION.get(index)[0] && !P1987.POSSIBLE_DIRECTION.get(index)[1] && !P1987.POSSIBLE_DIRECTION.get(index)[2] && !P1987.POSSIBLE_DIRECTION.get(index)[3]) {
+			if(P1987.PATH.size() > P1987.MAX_PATH) {
+				P1987.MAX_PATH = P1987.PATH.size();
+			}
+			return;
+		}
+		
+		
+		// 위쪽으로 이동
+		if(P1987.POSSIBLE_DIRECTION.get(index)[0]) {
+			P1987.POSSIBLE_DIRECTION.add(new boolean[4]);
+			P1987.PATH.add(P1987.BOARD[row-1][col]);
+			calcMaxPath(row-1, col, index+1);
+			P1987.PATH.remove(index+1);
+			P1987.POSSIBLE_DIRECTION.remove(index+1);
+		}
+		
+		// 아래쪽으로 이동
+		if(P1987.POSSIBLE_DIRECTION.get(index)[1]) {
+			P1987.POSSIBLE_DIRECTION.add(new boolean[4]);
+			P1987.PATH.add(P1987.BOARD[row+1][col]);
+			calcMaxPath(row+1, col, index+1);
+			P1987.PATH.remove(index+1);
+			P1987.POSSIBLE_DIRECTION.remove(index+1);
+		}
+		
+		// 왼쪽으로 이동
+		if(P1987.POSSIBLE_DIRECTION.get(index)[2]) {
+			P1987.POSSIBLE_DIRECTION.add(new boolean[4]);
+			P1987.PATH.add(P1987.BOARD[row][col-1]);
+			calcMaxPath(row, col-1, index+1);
+			P1987.PATH.remove(index+1);
+			P1987.POSSIBLE_DIRECTION.remove(index+1);
+		}
+		
+		// 오른쪽으로 이동
+		if(P1987.POSSIBLE_DIRECTION.get(index)[3]) {
+			P1987.POSSIBLE_DIRECTION.add(new boolean[4]);
+			P1987.PATH.add(P1987.BOARD[row][col+1]);
+			calcMaxPath(row, col+1, index+1);
+			P1987.PATH.remove(index+1);
+			P1987.POSSIBLE_DIRECTION.remove(index+1);
+		}
+	}
 }
+
+
+
+
+// 정답 코드
+/*import java.util.*;
+
+public class Main {
+    public static final int[] dx = {0, 0, 1, -1};
+    public static final int[] dy = {1, -1, 0, 0};
+    public static int go(String[] board, boolean[] check, int x, int y) {
+        int ans = 0;
+        for (int k=0; k<4; k++) {
+            int nx = x+dx[k];
+            int ny = y+dy[k];
+            if (nx >= 0 && nx < board.length && ny >= 0 && ny < board[0].length()) {
+                if (check[board[nx].charAt(ny)-'A'] == false) {
+                    check[board[nx].charAt(ny)-'A'] = true;
+                    int next = go(board, check, nx, ny);
+                    if (ans < next) {
+                        ans = next;
+                    }
+                    check[board[nx].charAt(ny)-'A'] = false;
+                }
+            }
+        }
+        return ans + 1;
+    }
+
+    public static void main(String args[]) {
+        Scanner sc = new Scanner(System.in);
+        int n = sc.nextInt();
+        int m = sc.nextInt();
+        sc.nextLine();
+        String[] board = new String[n];
+        for (int i=0; i<n; i++) {
+            board[i] = sc.nextLine();
+        }
+        boolean[] check = new boolean[26];
+        check[board[0].charAt(0)-'A'] = true;
+        System.out.println(go(board, check, 0, 0));
+    }
+}*/
