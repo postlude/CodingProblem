@@ -1,5 +1,10 @@
 package baekjoon.algorithmcourse;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.util.Scanner;
 
 /**
@@ -73,57 +78,67 @@ import java.util.Scanner;
 public class P11723 {
 
 	public static void main(String[] args) {
-		Scanner scan = new Scanner(System.in);
+		// scanner 사용시 시간 초과
+//		Scanner scan = new Scanner(System.in);
+//		int M = scan.nextInt();
 		
-		int M = Integer.parseInt(scan.nextLine());
-		int S = 0;
-		
-		for(int count=0; count<M; count++) {
-			String[] input = scan.nextLine().split(" ");
-			String oper = input[0];
-//			int num = -1;
-//			if(input.length == 2) {
-//				num = Integer.parseInt(input[1]);
-//			}
+		try(BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+			BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));	
+			){
+			int M = Integer.parseInt(br.readLine());
+			int S = 0;
 			
-			switch(oper) {
-				case "add" : {
-					int num = Integer.parseInt(input[1]);
-					S = S | (1<<num);
-					break;
-				}
-				case "remove" : {
-					int num = Integer.parseInt(input[1]);
-					S = S & ~(1<<num);
-					break;
-				}
-				case "check" : {
-					int num = Integer.parseInt(input[1]);
-//					if((S&(1<<num)) == 1<<num) {
-//						System.out.println(1);
-//					}else {
-//						System.out.println(0);
-//					}
-					System.out.println((S&(1<<num))>>num);
-					break;
-				}
-				case "toggle" : {
-					int num = Integer.parseInt(input[1]);
-					S = S ^ (1<<num);
-					break;
-				}
-				case "all" : {
-//					S = S | ~(1);
-					S = S | (1<<21) - 1;
-					break;
-				}
-				case "empty" : {
-					S = 0;
-					break;
+			for(int count=0; count<M; count++) {
+//				String oper = scan.next();
+				String[] input = br.readLine().split(" ");
+				String oper = input[0];
+				
+				switch(oper) {
+					case "add" : {
+	//					int num = scan.nextInt();
+						int num = Integer.parseInt(input[1]);
+						S = S | (1<<num);
+						break;
+					}
+					case "remove" : {
+	//					int num = scan.nextInt();
+						int num = Integer.parseInt(input[1]);
+						S = S & ~(1<<num);
+						break;
+					}
+					case "check" : {
+	//					int num = scan.nextInt();
+						int num = Integer.parseInt(input[1]);
+	//					if((S&(1<<num)) == 1<<num) {
+	//						System.out.println(1);
+	//					}else {
+	//						System.out.println(0);
+	//					}
+//						System.out.println((S&(1<<num))>>num);
+						bw.write(((S&(1<<num))>>num) + "\n");
+						break;
+					}
+					case "toggle" : {
+	//					int num = scan.nextInt();
+						int num = Integer.parseInt(input[1]);
+						S = S ^ (1<<num);
+						break;
+					}
+					case "all" : {
+						// 아래 코드도 가능
+	//					S = S | ~(1);
+						S = S | (1<<21) - 1;
+						break;
+					}
+					case "empty" : {
+						S = 0;
+						break;
+					}
 				}
 			}
+		}catch(IOException ioe) {
+			ioe.printStackTrace();
 		}
-		
 		
 		
 		// 시간 초과 남
@@ -175,6 +190,7 @@ public class P11723 {
 				}
 			}
 		}*/
-		scan.close();
+		
+//		scan.close();
 	}
 }
