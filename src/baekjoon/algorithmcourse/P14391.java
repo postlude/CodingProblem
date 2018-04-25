@@ -62,6 +62,15 @@ import java.util.Scanner;
  * 8
  * 
  */
+/*
+ * 무조건 4자리 4개로 하는 게 가장 큰 수를 만들지는 않는다.
+ * ex. 0005
+ *     0000
+ *     0000
+ *     5000
+ * 각각의 칸에 대해 가로로 계산할 지 세로로 계산할 지를 결정하면 됨
+ * 가로를 0, 세로를 1로 표현하고 비트마스크 이용
+ */
 public class P14391 {
 	public static void main(String[] args) {
 		Scanner scan = new Scanner(System.in);
