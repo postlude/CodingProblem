@@ -43,30 +43,40 @@ public class P11726 {
 		scan.close();
 		
 		P11726.RECTANGLE_WAY = new int[n+1];
+		P11726.RECTANGLE_WAY[0] = 1;
+		P11726.RECTANGLE_WAY[1] = 1;
 		
 		P11726 p11726 = new P11726();
-//		System.out.println(p11726.calcRectangleWay(n));
+		System.out.println(p11726.calcRectangleWay(n));
 		System.out.println(p11726.calcRectangleWay2(n));
 	}
 	
 	/**
-	 * 재귀 : 시간초과
+	 * 재귀
 	 * @param n
-	 * @return
+	 * @return 2×n 크기의 직사각형을 채우는 방법의 수
 	 */
-	/*public int calcRectangleWay(int n) {
-		if(n == 1) {
-			return 1;
-		}else if(n == 2) {
-			return 2;
-		}
-		
+	public int calcRectangleWay(int n) {
 		if(P11726.RECTANGLE_WAY[n] > 0) {
 			return P11726.RECTANGLE_WAY[n];
 		}
 		
-		return (calcRectangleWay(n-1) + calcRectangleWay(n-2))%10007;
-	}*/
+		if(P11726.RECTANGLE_WAY[n-1] > 0) {
+			P11726.RECTANGLE_WAY[n] += P11726.RECTANGLE_WAY[n-1];
+		}else {
+			P11726.RECTANGLE_WAY[n] += calcRectangleWay(n-1);
+		}
+		
+		if(P11726.RECTANGLE_WAY[n-2] > 0) {
+			P11726.RECTANGLE_WAY[n] += P11726.RECTANGLE_WAY[n-2];
+		}else {
+			P11726.RECTANGLE_WAY[n] += calcRectangleWay(n-2);
+		}
+		
+		P11726.RECTANGLE_WAY[n] %= 10007;
+		
+		return P11726.RECTANGLE_WAY[n];
+	}
 	
 	/**
 	 * for문
