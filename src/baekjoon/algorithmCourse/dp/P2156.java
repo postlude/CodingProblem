@@ -39,15 +39,21 @@ import java.util.Scanner;
  * 
  */
 /*
- * D[n][m] : n개의 잔, 마지막 잔을 먹었는지 안먹었는지(m==0 || m==1) 
- * D[n][m]
+ * D[n][m] : n개의 잔, 마지막 잔을 먹었는지 안먹었는지
+ * m=0 : 안마심, m=1 : 마심 
+ * D[n][0] = D[n-1] = max(D[n-1][0], D[n-1][1])
+ * D[n][1] = max(D[n-2][1]+wine[n], D[n-2][0]+wine[n-1]+wine[n], D[n-2][0]+wine[n])
+ *                  oxo                     xoo                       xxo
  */
 public class P2156 {
-	static int[][] MAX_WINE = new int[10001][2];
+//	static int[][] MAX_WINE = new int[10001][2];
+	static int[][] MAX_WINE;
 	
 	public static void main(String[] args) {
-		/*Scanner scan = new Scanner(System.in);
+		Scanner scan = new Scanner(System.in);
 		int n = scan.nextInt();
+		
+		P2156.MAX_WINE = new int[n+1][2];
 		
 		int[] wine = new int[n+1];
 		for(int index=1; index<=n; index++) {
@@ -61,16 +67,17 @@ public class P2156 {
 //		int m1 = p2156.maxWine(n, 1, wine);
 //		System.out.println(Math.max(m0, m1));
 		
-//		int[][] maxWine = new int[n+1][2];
-		System.out.println(p2156.maxWine2(n, wine));*/
+		System.out.println(p2156.maxWine2(n, wine));
 		
 		
-		P2156 p2156 = new P2156();
+		/*P2156 p2156 = new P2156();
 		
 		try(BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 			BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
 		){
 			int n = Integer.parseInt(br.readLine());
+			P2156.MAX_WINE = new int[n+1][2];
+			
 			int[] wine = new int[n+1];
 			for(int index=1; index<=n; index++) {
 				wine[index] = Integer.parseInt(br.readLine());
@@ -78,13 +85,23 @@ public class P2156 {
 			
 			int m0 = p2156.maxWine(n, 0, wine);
 			int m1 = p2156.maxWine(n, 1, wine);
-			int max = (m0>m1)?m0:m1;
-			bw.write(max + "\n");
+			if(m0 > m1) {
+				bw.write(m0 + "\n");
+			}else {
+				bw.write(m1 + "\n");
+			}
 		}catch(IOException ioe) {
 			ioe.printStackTrace();
-		}
+		}*/
 	}
 	
+	/**
+	 * 시간 초과
+	 * @param n
+	 * @param m
+	 * @param wine
+	 * @return
+	 */
 	public int maxWine(int n, int m, int[] wine) {
 		if(n==1 && m==0) {
 			return 0;
@@ -116,7 +133,11 @@ public class P2156 {
 				m1 = maxWine(n-1, 1, wine);
 			}
 			
-			return (m0>m1)?m0:m1;
+			if(m0 > m1) {
+				return m0;
+			}else {
+				return m1;
+			}
 		}else {
 			int oxo = 0;
 			if(P2156.MAX_WINE[n-2][1] > 0) {
@@ -140,11 +161,19 @@ public class P2156 {
 		}
 	}
 	
+	/**
+	 * for문 (통과)
+	 * @param n
+	 * @param wine
+	 * @return
+	 */
 	public int maxWine2(int n, int[] wine) {
 		P2156.MAX_WINE[1][0] = 0;
 		P2156.MAX_WINE[1][1] = wine[1];
-		P2156.MAX_WINE[2][0] = wine[1];
-		P2156.MAX_WINE[2][1] = wine[1] + wine[2];
+		if(n >= 2) {
+			P2156.MAX_WINE[2][0] = wine[1];
+			P2156.MAX_WINE[2][1] = wine[1] + wine[2];
+		}
 		
 		for(int index=3; index<=n; index++) {
 			P2156.MAX_WINE[index][0] = Math.max(P2156.MAX_WINE[index-1][0], P2156.MAX_WINE[index-1][1]);
@@ -158,3 +187,39 @@ public class P2156 {
 		return Math.max(P2156.MAX_WINE[n][0], P2156.MAX_WINE[n][1]);
 	}
 }
+
+
+
+
+// 정답 코드
+/*
+ * 마지막에 연속으로 마신 와인의 수를 가지고 점화식을 만듦
+ * 0번 연속(n번째를 마시지 않음) : D[n-1]
+ * 1번 연속(n번째를 마시고 n-1번째를 마시지 않음) : D[n-2] + wine[n]
+ * 2번 연속(n-1, n번째를 마시고 n-2번째는 마시지 않음) : D[n-3] + wine[n-1] + wine[n]
+ * D[n] = max(D[n-1], D[n-2] + wine[n], D[n-3] + wine[n-1] + wine[n])
+ */
+/*import java.util.*;
+
+public class Main {
+    public static void main(String args[]) {
+        Scanner sc = new Scanner(System.in);
+        int n = sc.nextInt();
+        int[] a = new int[n+1];
+        for (int i=1; i<=n; i++) {
+            a[i] = sc.nextInt();
+        }
+        int[] d = new int[n+1];
+        d[1] = a[1];
+        if (n >= 2) {
+            d[2] = a[1]+a[2];
+        }
+        for (int i=3; i<=n; i++) {
+            d[i] = d[i-1];
+            d[i] = Math.max(d[i], d[i-2]+a[i]);
+            d[i] = Math.max(d[i], d[i-3]+a[i-1]+a[i]);
+        }
+        int ans = d[n];
+        System.out.println(ans);
+    }
+}*/
