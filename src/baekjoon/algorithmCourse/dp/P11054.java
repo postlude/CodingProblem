@@ -25,7 +25,10 @@ import java.util.Scanner;
  * 7
  */
 /*
- * 
+ * k를 기준으로 왼쪽은 왼->오 로 가는 증가하는 부분 수열, 오른쪽은 오->왼 으로 가는 증가하는 부분 수열
+ * D1[n] : 왼쪽에서 시작해서 오른쪽으로 증가하는 가장 긴 부분 수열
+ * D2[n] : 오른쪽에서 시작해서 왼쪽으로 증가하는 가장 긴 부분 수열
+ * D[n] = D1[n] + D2[n] - 1
  */
 public class P11054 {
 	static int[] LEFT_SUB_SEQ_LENGTH;
@@ -48,10 +51,30 @@ public class P11054 {
 		P11054 p11054 = new P11054();
 		
 		// for문 사용 메소드
-		System.out.println(p11054.calcLongestBitonicSubSeq(n, a));
+//		System.out.println(p11054.calcLongestBitonicSubSeq(n, a));
 		
+		// 재귀 메소드
+		P11054.LEFT_SUB_SEQ_LENGTH[1] = 1;
+		P11054.RIGHT_SUB_SEQ_LENGTH[n] = 1;
+		
+		p11054.calcLongestBitonicSubSeq2(n, a);
+		
+		int maxLength = 1;
+		for(int index=1; index<=n; index++) {
+			int bitonicSubSeqLength = P11054.LEFT_SUB_SEQ_LENGTH[index] + P11054.RIGHT_SUB_SEQ_LENGTH[index] - 1;
+			if(bitonicSubSeqLength > maxLength) {
+				maxLength = bitonicSubSeqLength;
+			}
+		}
+		System.out.println(maxLength);
 	}
 	
+	/**
+	 * for문 이용
+	 * @param n
+	 * @param a
+	 * @return 가장 긴 바이토닉 부분 수열 길이
+	 */
 	public int calcLongestBitonicSubSeq(int n, int[] a) {
 		// 왼쪽에서 시작해서 오른쪽으로 증가하는 부분 수열 계산
 		P11054.LEFT_SUB_SEQ_LENGTH[1] = 1;
@@ -90,10 +113,25 @@ public class P11054 {
 		return maxLength;
 	}
 	
-	/*public void calcLongestBitonicSubSeq2(int n, int[] a) {
+	/**
+	 * 재귀 이용
+	 * @param n : input으로 주어지는 n
+	 * @param a
+	 */
+	public void calcLongestBitonicSubSeq2(int n, int[] a) {
 		if(n == 1) {
 			return;
 		}
+		
+		// n, n-1, n-2.. 1 로 진행되는 재귀 함수이므로
+		// 오른쪽에서 왼쪽으로 증가하는 부분 수열은 재귀 호출되는 부분보다 위에서 계산 
+		P11054.RIGHT_SUB_SEQ_LENGTH[n] = 1;
+		for(int subSeqIndex=P11054.RIGHT_SUB_SEQ_LENGTH.length-1; subSeqIndex>n; subSeqIndex--) {
+			if(a[n]>a[subSeqIndex] && P11054.RIGHT_SUB_SEQ_LENGTH[n]<P11054.RIGHT_SUB_SEQ_LENGTH[subSeqIndex]+1) {
+				P11054.RIGHT_SUB_SEQ_LENGTH[n] = P11054.RIGHT_SUB_SEQ_LENGTH[subSeqIndex] + 1;
+			}
+		}
+		
 		if(P11054.LEFT_SUB_SEQ_LENGTH[n-1] == 0) {
 			calcLongestBitonicSubSeq2(n-1, a);
 		}
@@ -105,11 +143,5 @@ public class P11054 {
 			}
 		}
 		
-		P11054.RIGHT_SUB_SEQ_LENGTH[n] = 1;
-		for(int subSeqIndex=1; subSeqIndex<n; subSeqIndex++) {
-			if(a[n]>a[subSeqIndex] && P11054.RIGHT_SUB_SEQ_LENGTH[n]<P11054.RIGHT_SUB_SEQ_LENGTH[subSeqIndex]+1) {
-				P11054.RIGHT_SUB_SEQ_LENGTH[n] = P11054.RIGHT_SUB_SEQ_LENGTH[subSeqIndex] + 1;
-			}
-		}
-	}*/
+	}
 }
