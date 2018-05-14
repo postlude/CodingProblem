@@ -94,7 +94,7 @@ public class P13549 {
 			int nowPosition = deque.poll();
 			
 			/*for (int next : new int[]{nowPosition-1, nowPosition+1, nowPosition*2}) {
-                if (next >= 0 && next < MAX) {
+                if (next >= 0 && next <= MAX) {
                     if (isVisited2[next] == false) {
                         isVisited2[next] = true;
                         if (next == nowPosition*2) {
@@ -109,34 +109,35 @@ public class P13549 {
             }*/
 			
 			// -1 위치로 이동
-			if(nowPosition-1 >= 0) {
+			if(nowPosition-1 >= 0 && nowPosition-1<=MAX) {
 				if(!isVisited2[nowPosition-1]) {
 //					deque.add(nowPosition-1);
-					deque.addLast(nowPosition-1);
 					isVisited2[nowPosition-1] = true;
+					deque.addLast(nowPosition-1);
 					time2[nowPosition-1] = time2[nowPosition] + 1; 
 				}
 			}
 			
 			// +1 위치로 이동
-			if(nowPosition+1 <= P13549.MAX) {
+			if(nowPosition+1 <= P13549.MAX && nowPosition+1>=0) {
 				if(!isVisited2[nowPosition+1]) {
 //					deque.add(nowPosition+1);
-					deque.addLast(nowPosition+1);
 					isVisited2[nowPosition+1] = true;
+					deque.addLast(nowPosition+1);
 					time2[nowPosition+1] = time2[nowPosition] + 1;
 				}
 			}
 			
 			// *2 위치로 이동
-			if(nowPosition*2 <= P13549.MAX) {
+			if(nowPosition*2 <= P13549.MAX && nowPosition*2>=0) {
 				if(!isVisited2[nowPosition*2]) {
-					deque.addFirst(nowPosition*2);
 					isVisited2[nowPosition*2] = true;
+					deque.addFirst(nowPosition*2);
 					time2[nowPosition*2] = time2[nowPosition]; 
 				}
 			}
 		}
+		
 //		System.out.println(deque.toString());
 		System.out.println(time2[k]);
 	}
