@@ -55,7 +55,12 @@ public class P2206 {
 		// input end
 		
 		Queue<Room> queue = new LinkedList<>();
+		
+		// 벽을 한 번밖에 부수지 못하므로 그 전까지 벽을 0번 부순 경우와 1번 부순 경우를 따로 생각해야 함
 		int[][][] roomCount = new int[n][m][2];
+		
+		// 다른 문제처럼 boolean 배열을 사용할수는 없다.
+		// 어떤 한 방을 방문하는 경우가 이전에 벽을 부수고 온 경우와 벽을 부수지 않고 오는 경우 모두 존재할 수 있기 때문 
 		
 		queue.add(new Room(0, 0, 0));
 		roomCount[0][0][0] = 1;
@@ -69,19 +74,23 @@ public class P2206 {
 			for(int index=0; index<4; index++) {
 				int nextRow = nowRow + P2206.ROW_MOVE[index];
 				int nextCol = nowCol + P2206.COL_MOVE[index];
-				int nextWallBreak = nowWallBreak;
 				
 				if(nextRow<0 || nextRow>=n || nextCol<0 || nextCol>=m) {
 					continue;
-				}else if(nowWallBreak == 0) {
-					if(maze[nextRow][nextCol] == 1) {
-						nextWallBreak = 1;
-					}
-				}else if(maze[nextRow][nextCol] == 1) {
-					continue;
 				}
-				queue.add(new Room(nextRow, nextCol, nextWallBreak));
-				roomCount[nextRow][nextCol][nextWallBreak] = roomCount[nowRow][nowCol][nowWallBreak] + 1; 
+				
+				// 다음 방이 벽이 없는 경우 (0->0, 1->0)
+				// 이전에 왔던 곳을 다시 방문하는 걸 방지하기 위해 다음 방의 roomCount가 0인 곳일 경우에만 방문 
+				if(maze[nextRow][nextCol]==0 && roomCount[nextRow][nextCol][nowWallBreak]==0) {
+					queue.add(new Room(nextRow, nextCol, nowWallBreak));
+					roomCount[nextRow][nextCol][nowWallBreak] = roomCount[nowRow][nowCol][nowWallBreak] + 1;
+				}else if(maze[nextRow][nextCol]==1 && nowWallBreak==0 && roomCount[nextRow][nextCol][1]==0) { 
+					// 다음 방이 벽이 있는 경우(0->1)
+					// 이전에 벽을 부순 적이 없어야 하고(nowWallBreak==0)
+					// 마찬가지로 재방문 방지를 위해 roomCount가 0인 곳일 경우에만 방문
+					queue.add(new Room(nextRow, nextCol, 1));
+					roomCount[nextRow][nextCol][1] = roomCount[nowRow][nowCol][nowWallBreak] + 1;
+				}
 			}
 		}
 		
@@ -115,3 +124,66 @@ class Room{
 		this.wallBreak = wallBreak;
 	}
 }
+
+
+
+
+// 정답 코드
+/*import java.util.*;
+class Pair {
+    int x, y, z;
+    Pair(int x, int y, int z) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+    }
+}
+public class Main {
+    public static int[] dx = {1, -1, 0, 0};
+    public static int[] dy = {0, 0, 1, -1};
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        int n = sc.nextInt();
+        int m = sc.nextInt();
+        sc.nextLine();
+        int[][] a = new int[n][m];
+        int[][][] d = new int[n][m][2];
+        for (int i=0; i<n; i++) {
+            String s = sc.nextLine();
+            for (int j=0; j<m; j++) {
+                a[i][j] = s.charAt(j) - '0';
+            }
+        }
+        d[0][0][0] = 1;
+        Queue<Pair> q = new LinkedList<Pair>();
+        q.offer(new Pair(0, 0, 0));
+        while (!q.isEmpty()) {
+            Pair p = q.remove();
+            int x = p.x;
+            int y = p.y;
+            int z = p.z;
+            for (int k=0; k<4; k++) {
+                int nx = x+dx[k];
+                int ny = y+dy[k];
+                if (nx < 0 || nx >= n || ny < 0 || ny >= m) continue;
+                if (a[nx][ny] == 0 && d[nx][ny][z] == 0) {
+                    d[nx][ny][z] = d[x][y][z] + 1;
+                    q.offer(new Pair(nx, ny, z));
+                }
+                if (z == 0 && a[nx][ny] == 1 && d[nx][ny][z+1] == 0) {
+                    d[nx][ny][z+1] = d[x][y][z] + 1;
+                    q.offer(new Pair(nx, ny, z+1));
+                }
+            }
+        }
+        if (d[n-1][m-1][0] != 0 && d[n-1][m-1][1] != 0) {
+            System.out.println(Math.min(d[n-1][m-1][0], d[n-1][m-1][1]));
+        } else if (d[n-1][m-1][0] != 0) {
+            System.out.println(d[n-1][m-1][0]);
+        } else if (d[n-1][m-1][1] != 0) {
+            System.out.println(d[n-1][m-1][1]);
+        } else {
+            System.out.println(-1);
+        }
+    }
+}*/
