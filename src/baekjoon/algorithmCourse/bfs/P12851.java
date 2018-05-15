@@ -57,7 +57,7 @@ public class P12851 {
 					isVisited[nowPosition-1] = true;
 					time[nowPosition-1] = time[nowPosition] + 1; 
 					numOfWay[nowPosition-1] = numOfWay[nowPosition];
-				}else if(numOfWay[nowPosition-1] != numOfWay[nowPosition]){
+				}else if(time[nowPosition-1] == time[nowPosition]+1){// 이미 방문한 적이 있는 곳에 방문 방법을 누적할 때 time이 최소값과 같아야 누적
 					numOfWay[nowPosition-1] += numOfWay[nowPosition];
 				}
 			}
@@ -69,7 +69,7 @@ public class P12851 {
 					isVisited[nowPosition+1] = true;
 					time[nowPosition+1] = time[nowPosition] + 1; 
 					numOfWay[nowPosition+1] = numOfWay[nowPosition];
-				}else if(numOfWay[nowPosition+1] != numOfWay[nowPosition]){
+				}else if(time[nowPosition+1] == time[nowPosition]+1){
 					numOfWay[nowPosition+1] += numOfWay[nowPosition];
 				}
 			}
@@ -81,7 +81,7 @@ public class P12851 {
 					isVisited[nowPosition*2] = true;
 					time[nowPosition*2] = time[nowPosition] + 1; 
 					numOfWay[nowPosition*2] = numOfWay[nowPosition];
-				}else if(numOfWay[nowPosition*2] != numOfWay[nowPosition]){
+				}else if(time[nowPosition*2] == time[nowPosition]+1){
 					numOfWay[nowPosition*2] += numOfWay[nowPosition];
 				}
 			}

@@ -1,8 +1,6 @@
 package baekjoon.algorithmCourse.bfs;
 
 import java.util.ArrayDeque;
-import java.util.LinkedList;
-import java.util.Queue;
 import java.util.Scanner;
 
 /**
@@ -90,9 +88,10 @@ public class P13549 {
 		deque.add(n);
 		
 		while(!deque.isEmpty()) {
-//			int nowPosition = deque.remove();
-			int nowPosition = deque.poll();
+			int nowPosition = deque.remove();
 			
+			// 99 line에 *2와 비교하는 부분이 있기 때문에 nowPosition*2가 마지막에 있어도 된다.
+			// ex) 1 -> 2 에서 +1이 먼저 계산되더라도 if문 안으로 들어가게 됨
 			/*for (int next : new int[]{nowPosition-1, nowPosition+1, nowPosition*2}) {
                 if (next >= 0 && next <= MAX) {
                     if (isVisited2[next] == false) {
@@ -108,37 +107,36 @@ public class P13549 {
                 }  
             }*/
 			
-			// -1 위치로 이동
-			if(nowPosition-1 >= 0 && nowPosition-1<=MAX) {
-				if(!isVisited2[nowPosition-1]) {
-//					deque.add(nowPosition-1);
-					isVisited2[nowPosition-1] = true;
-					deque.addLast(nowPosition-1);
-					time2[nowPosition-1] = time2[nowPosition] + 1; 
-				}
-			}
-			
-			// +1 위치로 이동
-			if(nowPosition+1 <= P13549.MAX && nowPosition+1>=0) {
-				if(!isVisited2[nowPosition+1]) {
-//					deque.add(nowPosition+1);
-					isVisited2[nowPosition+1] = true;
-					deque.addLast(nowPosition+1);
-					time2[nowPosition+1] = time2[nowPosition] + 1;
-				}
-			}
-			
 			// *2 위치로 이동
-			if(nowPosition*2 <= P13549.MAX && nowPosition*2>=0) {
+			// *2 위치 계산을 가장 먼저 해야한다.
+			// 덱 사용 여부와 상관없이 +1, -1 계산에서 방문을 하게 되면 *2에서 아예 방문하지 못하는 경우가 생기기 때문
+			if(nowPosition*2 <= P13549.MAX) {
 				if(!isVisited2[nowPosition*2]) {
 					isVisited2[nowPosition*2] = true;
 					deque.addFirst(nowPosition*2);
 					time2[nowPosition*2] = time2[nowPosition]; 
 				}
 			}
+			
+			// -1 위치로 이동
+			if(nowPosition-1 >= 0) {
+				if(!isVisited2[nowPosition-1]) {
+					isVisited2[nowPosition-1] = true;
+					deque.add(nowPosition-1);
+					time2[nowPosition-1] = time2[nowPosition] + 1; 
+				}
+			}
+			
+			// +1 위치로 이동
+			if(nowPosition+1 <= P13549.MAX) {
+				if(!isVisited2[nowPosition+1]) {
+					isVisited2[nowPosition+1] = true;
+					deque.add(nowPosition+1);
+					time2[nowPosition+1] = time2[nowPosition] + 1;
+				}
+			}
 		}
 		
-//		System.out.println(deque.toString());
 		System.out.println(time2[k]);
 	}
 }
