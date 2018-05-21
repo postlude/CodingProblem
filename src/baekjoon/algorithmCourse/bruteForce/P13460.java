@@ -125,24 +125,13 @@ public class P13460 {
 	static final int MOVE_LIMIT = 10;
 	
 	// 각각의 공과 구멍 위치
-	static int RED_BALL_ROW;
-	static int RED_BALL_COL;
-	static int BLUE_BALL_ROW;
-	static int BLUE_BALL_COL;
-	static int HOLE_ROW;
-	static int HOLE_COL;
+	static Position RED_BALL;
+	static Position BLUE_BALL;
 		
 	public static void main(String[] args) {
 		Scanner scan = new Scanner(System.in);
 		int n = scan.nextInt();
 		int m = scan.nextInt();
-		
-//		int redBallRow = -1;
-//		int redBallCol = -1;
-//		int blueBallRow = -1;
-//		int blueBallCol = -1;
-//		int holeRow = -1;
-//		int holeCol = -1;
 		
 		char[][] originMap = new char[n][m];
 		
@@ -151,20 +140,9 @@ public class P13460 {
 			for(int col=0; col<m; col++) {
 				originMap[row][col] = input.charAt(col);
 				if(originMap[row][col] == 'R') {
-//					redBallRow = row;
-//					redBallCol = col;
-					P13460.RED_BALL_ROW = row;
-					P13460.RED_BALL_COL = col;
+					P13460.RED_BALL = new Position(row, col);
 				}else if(originMap[row][col] == 'B') {
-//					blueBallRow = row;
-//					blueBallCol = col;
-					P13460.BLUE_BALL_ROW = row;
-					P13460.BLUE_BALL_COL = col;
-				}else if(originMap[row][col] == 'O') {
-//					holeRow = row;
-//					holeCol = col;
-					P13460.HOLE_ROW = row;
-					P13460.HOLE_COL = col;
+					P13460.BLUE_BALL = new Position(row, col);
 				}
 			}
 		}
@@ -173,7 +151,7 @@ public class P13460 {
 		
 		
 		P13460 p13460 = new P13460();
-		int minMoveCount = P13460.MOVE_LIMIT;
+		int minMoveCount = -1;
 		
 		// 최대 10회만 이동하면 되므로 10번의 이동방향의 종류를 모두 만든다.
         // 상하좌우 4개 방향으로 이동 가능하므로 2bit가 필요
@@ -187,11 +165,22 @@ public class P13460 {
 			}
 			
 			// 이동할 때 map이 바뀌므로 매번 새로운 map 생성
-			char[][] checkMap = originMap.clone();
+			char[][] checkMap = new char[n][m];
+			for(int row=0; row<n; row++) {
+				for(int col=0; col<m; col++) {
+					checkMap[row][col] = originMap[row][col];
+				}
+			}
+			
 			int currentMoveCount = p13460.countMove(checkMap, directionAry);
 			
-			// currentMoveCount가 -1이 아닐 경우에만 비교
-			if(currentMoveCount!=-1 && minMoveCount>currentMoveCount) {
+			// currentMoveCount가 -1일 경우(불가능한 경우)에는 비교하지 않음
+			if(currentMoveCount == -1) {
+				continue;
+			}
+			
+			// minMoveCount가 초기값(-1)이거나 currentMoveCount이 더 작으면
+			if(minMoveCount==-1 || minMoveCount>currentMoveCount) {
 				minMoveCount = currentMoveCount;
 			}
 		}
@@ -199,34 +188,84 @@ public class P13460 {
 		System.out.println(minMoveCount);
 	}
 	
-	
-	
-	
+	/**
+	 * 이동 횟수 세는 메소드
+	 * @param checkMap
+	 * @param directionAry
+	 * @return
+	 */
 	public int countMove(char[][] checkMap, int[] directionAry) {
-		// 파란 구슬이 빠진 경우에는 움직인 횟수가 의미가 없으므로 -1로 초기화
-		int moveCount = -1;
-		
-		int redBallRow = P13460.RED_BALL_ROW;
-		int redBallCol = P13460.RED_BALL_COL;
-		int blueBallRow = P13460.BLUE_BALL_ROW;
-		int blueBallCol = P13460.BLUE_BALL_COL;
-		int holeRow = P13460.HOLE_ROW;
-		int holeCol = P13460.HOLE_COL;
+		Position nowRedBall = new Position(P13460.RED_BALL);
+		Position nowBlueBall = new Position(P13460.BLUE_BALL);
+		int moveCount = 0;
 		
 		for(int direction : directionAry) {
-			int nextRedBallRow = redBallRow + P13460.ROW_MOVE[direction];
-			int nextRedBallCol = redBallCol + P13460.COL_MOVE[direction];
-			int nextBlueBallRow = blueBallRow + P13460.ROW_MOVE[direction];
-			int nextBlueBallCol = blueBallCol + P13460.COL_MOVE[direction];
+			while(true) {
+				boolean isRedBallMoved = moveBall(checkMap, nowRedBall, direction); 
+				boolean isBlueBallMoved = moveBall(checkMap, nowBlueBall, direction);
+				if(!isRedBallMoved && !isBlueBallMoved) {
+					break;
+				}
+				
+				// 파란 공이 빠졌으면
+				if(checkMap[nowBlueBall.row][nowBlueBall.col] == '.') {
+					return -1;
+				}
+			}
+			moveCount++;
 			
-			
+			if(checkMap[nowRedBall.row][nowRedBall.col] == '.') {
+				return moveCount;
+			}
 		}
 		
-		return moveCount;
+		if(checkMap[nowRedBall.row][nowRedBall.col] == '.') {
+			return P13460.MOVE_LIMIT;
+		}else {
+			return -1;
+		}
 	}
 	
+	/**
+	 * 공 이동 메소드
+	 * @param checkMap
+	 * @param initPosition
+	 * @param direction
+	 * @return
+	 */
+	public boolean moveBall(char[][] checkMap, Position nowPosition, int direction) { 
+		boolean isMoved = false;
+		
+		// 공이 빠진 상태에서 또 움직이려고 하면
+		if(checkMap[nowPosition.row][nowPosition.col] == '.') {
+			return isMoved;
+		}
+		
+		do {
+			Position nextPosition = new Position(nowPosition.row+P13460.ROW_MOVE[direction], nowPosition.col+P13460.COL_MOVE[direction]);
+			char nextCh = checkMap[nextPosition.row][nextPosition.col];
+			
+			if(nextCh == '.') {
+				// 공과 빈 공간 swap
+				char nowCh = checkMap[nowPosition.row][nowPosition.col];
+				checkMap[nowPosition.row][nowPosition.col] = nextCh;
+				checkMap[nextPosition.row][nextPosition.col] = nowCh;
+				
+				// 현 위치를 다음 위치로 변경
+				nowPosition.setPosition(nextPosition);
+				isMoved = true;
+			}else if(nextCh=='#' || nextCh=='B' || nextCh=='R') {
+				break;
+			}else if(nextCh == 'O') {
+				checkMap[nowPosition.row][nowPosition.col] = '.';
+				isMoved = true;
+				break;
+			}
+		}while(true);
+		
+		return isMoved;
+	}
 	
-
 	/**
 	 * 파라미터로 받은 숫자로 이동방향 배열 만드는 메소드
 	 * @param directionNum
@@ -271,3 +310,195 @@ public class P13460 {
 		return true;
 	}
 }
+
+class Position{
+	int row;
+	int col;
+	
+	public Position(int row, int col) {
+		this.row = row;
+		this.col = col;
+	}
+	
+	public Position(Position position) {
+		this.row = position.row;
+		this.col = position.col;
+	}
+	
+	public void setPosition(Position position) {
+		this.row = position.row;
+		this.col = position.col;
+	}
+}
+
+
+
+//정답 코드
+/*import java.util.*;
+class Result {
+    boolean isMoved, hole;
+    int x, y;
+    Result(boolean isMoved, boolean hole, int x, int y) {
+        this.isMoved = isMoved;
+        this.hole = hole;
+        this.x = x;
+        this.y = y;
+    }
+}
+public class Main {
+    static int[] dx = {0,0,1,-1};
+    static int[] dy = {1,-1,0,0};
+    static final int LIMIT = 10;
+    
+    static int[] generateDirection(int directionNum) {
+        int[] direction = new int[LIMIT];
+        for (int i=0; i<LIMIT; i++) {
+        	// 상하좌우 이동의 index값(0~3)을 만들기 위해 3(2진수로 11)과 &연산 후 2bit씩 뺀다.
+            direction[i] = (directionNum&3);
+            directionNum >>= 2;
+        }
+        return direction;
+    }
+    
+    static Result simulate(char[][] board, int moveDirection, int x, int y) {
+        int n = board.length;
+        int m = board[0].length;
+        
+        // 구멍에 빠져서 . 이면 
+        if (board[x][y] == '.') return new Result(false, false, x, y);
+        
+        boolean isMoved = false;
+        while (true) {
+            int nx = x+dx[moveDirection];
+            int ny = y+dy[moveDirection];
+            
+            // 이동 불가능한 경우
+            if (nx < 0 || nx >= n || ny < 0 || ny >= m) {
+                return new Result(isMoved, false, x, y);
+            }
+            
+            char ch = board[nx][ny];
+            if (ch == '#') {
+                return new Result(isMoved, false, x, y);
+            } else if (ch == 'R' || ch == 'B') {
+            	// 다른 공을 만난 경우
+                return new Result(isMoved, false, x, y);
+            } else if (ch == '.') {
+            	// 한 칸 이동했는데 빈 공간이면 계속 이동
+                char temp = board[nx][ny];
+                board[nx][ny] = board[x][y];
+                board[x][y] = temp;
+                x = nx;
+                y = ny;
+                isMoved = true;
+            } else if (ch == 'O') {
+            	// 구멍에 빠지면 현재 공이 있는 위치를 빈공간을 바꿈
+                board[x][y] = '.';
+                isMoved = true;
+                return new Result(isMoved, true, x, y);
+            }
+        }
+    }
+    static int check(char[][] board, int[] direction) {
+        int n = board.length;
+        int m = board[0].length;
+        int hx = 0, hy = 0;
+        int rx = 0, ry = 0;
+        int bx = 0, by = 0;
+        for (int i=0; i<n; i++) {
+            for (int j=0; j<m; j++) {
+                if (board[i][j] == 'O') {
+                    hx = i; hy = j;
+                } else if (board[i][j] == 'R') {
+                    rx = i; ry = j;
+                } else if (board[i][j] == 'B') {
+                    bx = i; by = j;
+                }
+            }
+        }
+        
+        int cnt = 0;
+        for (int moveDirection : direction) {
+            cnt += 1;
+            boolean isRedBallInHole = false, isBlueBallInHole = false;
+            
+            while (true) {
+                Result redBall = simulate(board, moveDirection, rx, ry);
+                // 다음 이동을 위해 위치 저장
+                rx = redBall.x; ry = redBall.y;
+                
+                Result blueBall = simulate(board, moveDirection, bx, by);
+                bx = blueBall.x; by = blueBall.y;
+                
+                // 이동 방향은 이미 direction배열에 저장되어 있다.
+                // 언젠가는 반드시 움직이지 않는 순간이 옴
+                if (redBall.isMoved == false && blueBall.isMoved == false) {
+                    break;
+                }
+                if (redBall.hole) isRedBallInHole = true;
+                if (blueBall.hole) isBlueBallInHole = true;
+            }
+            // 이동 중에 파란공이 빠짐
+            if (isBlueBallInHole) return -1;
+            
+            // 이동 중에 빨간공이 빠짐 
+            if (isRedBallInHole) return cnt;
+        }
+        
+        // 이동을 끝마쳤으나 아무 공도 빠지지 않음
+        return -1;
+    }
+    
+    *//**
+     * 올바른 이동인지를 체크하는 메소드
+     * @param dir
+     * @return
+     *//*
+    static boolean valid(int[] dir) {
+        int l = dir.length;
+        for (int i=0; i+1<l; i++) {
+        	// 서로 반대 방향으로 이동하는 경우는 의미가 없음
+            if (dir[i] == 0 && dir[i+1] == 1) return false;
+            if (dir[i] == 1 && dir[i+1] == 0) return false;
+            if (dir[i] == 2 && dir[i+1] == 3) return false;
+            if (dir[i] == 3 && dir[i+1] == 2) return false;
+            
+            // 같은 방향으로 2번 연속 움직여도 의미 없음
+            if (dir[i] == dir[i+1]) return false;
+        }
+        return true;
+    }
+    public static void main(String args[]) {
+        Scanner sc = new Scanner(System.in);
+        int n = sc.nextInt();
+        int m = sc.nextInt();
+        String[] map = new String[n];
+        char[][] board = new char[n][m];
+        for (int i=0; i<n; i++) {
+            map[i] = sc.next();
+        }
+        
+        int ans = -1;
+        
+        // 최대 10회만 이동하면 되므로 10번의 이동방향을 모두 만든다.
+        // 상하좌우 4개 방향으로 이동 가능하므로 2bit가 필요
+        // 10번의 방향을 만들기 위해선 총 20bit가 필요
+        for (int directionNum=0; directionNum<(1<<(LIMIT*2)); directionNum++) {
+            int[] direction = generateDirection(directionNum);
+            if (!valid(direction)) continue;
+          
+            // 한 번 이동을 검사할 때마다 원래 map의 정보가 바뀌므로 매 번 원래 map으로 세팅
+            for (int i=0; i<n; i++) {
+                board[i] = map[i].toCharArray();
+            }
+            
+            // 현재 이동방향으로 이동했을 때 움직인 횟수
+            int cur = check(board, direction);
+            
+            // -1은 파란공이 빠지거나 빨간공이 빠지지 못한 경우이므로 아래 if문에서 검사하면 안됨
+            if (cur == -1) continue;
+            if (ans == -1 || ans > cur) ans = cur;
+        }
+        System.out.println(ans);
+    }
+}*/
