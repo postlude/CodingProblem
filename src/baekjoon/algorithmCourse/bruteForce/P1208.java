@@ -1,7 +1,7 @@
 package baekjoon.algorithmCourse.bruteForce;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.Scanner;
 
 /**
@@ -33,26 +33,212 @@ public class P1208 {
 		int n = scan.nextInt();
 		int s = scan.nextInt();
 		
-		int[] numAry1 = new int[n];
-		int[] numAry2 = new int[n];
-		int ary1Size = n / 2;
-		int ary2Size = n - n/2;
-		for(int index=0; index<ary1Size; index++) {
-			numAry1[index] = scan.nextInt();
-		}	
-		for(int index=0; index<ary2Size; index++) {
-			numAry2[index] = scan.nextInt();
+		int[] numAry = new int[n];
+		for(int index=0; index<n; index++) {
+			numAry[index] = scan.nextInt();
 		}
 		scan.close();
 		
+		int numCount1 = n / 2;
+		int numCount2 = n - numCount1;
+//		int numCount2 = n / 2;
+//		int numCount1 = n - numCount2;
 		
 		ArrayList<Integer> list1 = new ArrayList<>();
-		list1.add(0);
-		for(int index1=0; index1<ary1Size; index1++) {
-			for(int index2=index1+1; index2<ary1Size; index2++) {
+		for(int subSetNum=0; subSetNum<(1<<numCount1); subSetNum++) {
+			int subSetSum = 0;
+			for(int index=0; index<numCount1; index++) {
+				if((subSetNum&(1<<index)) == (1<<index)) { 
+					subSetSum += numAry[index];
+				}
+			}
+			list1.add(subSetSum);
+		}
+		
+		ArrayList<Integer> list2 = new ArrayList<>();
+		for(int subSetNum=0; subSetNum<(1<<numCount2); subSetNum++) {
+			int subSetSum = 0;
+			for(int index=0; index<numCount2; index++) {
+				if((subSetNum&(1<<index)) == (1<<index)) { 
+					subSetSum += numAry[index+numCount1];
+				}
+			}
+			list2.add(subSetSum);
+		}
+		
+		Collections.sort(list1);
+		Collections.sort(list2);
+		
+//		for(int num : list1) {
+//			System.out.print(num + " ");
+//		}
+//		System.out.println();
+//		for(int num : list2) {
+//			System.out.print(num + " ");
+//		}
+//		System.out.println();
+		
+		int list1Size = list1.size();
+		int list2Size = list2.size();
+		int leftIndex = 0;
+		int rightIndex = list2Size - 1;
+		long count = 0;
+		
+		while(leftIndex<list1Size && rightIndex>=0) {
+			int leftSum = list1.get(leftIndex);
+			int rightSum = list2.get(rightIndex);
+			int sum = list1.get(leftIndex) + list2.get(rightIndex);
+			
+			if(sum == s) {
+//				long leftCount = 1;
+//				long rightCount = 1;
+//				leftIndex++;
+//				rightIndex--;
 				
+				long leftCount = 0;
+				long rightCount = 0;
+				
+//				while(leftIndex<list1Size && list1.get(leftIndex)==list1.get(leftIndex-1)) {
+				while(leftIndex<list1Size && leftSum==list1.get(leftIndex)) {
+					leftCount++;
+					leftIndex++;
+				}
+				
+//				while(rightIndex>=0 && list2.get(rightIndex)==list2.get(rightIndex+1)) {
+				while(rightIndex>=0 && rightSum==list2.get(rightIndex)) {
+					rightCount++;
+					rightIndex--;
+				}
+				
+				count += leftCount*rightCount;
+			}else if(sum > s) {
+				rightIndex--;
+			}else {
+				leftIndex++;
 			}
 		}
+		
+		
+//		Collections.reverse(list2);
+		
+		/*int list1Size = list1.size();
+		int list2Size = list2.size();
+		int leftIndex = 0;
+		int rightIndex = 0;
+		long count = 0;
+		
+		while(leftIndex<list1Size && rightIndex<list2Size) {
+			int leftSum = list1.get(leftIndex);
+			int rightSum = list2.get(rightIndex);
+			
+			int sum = list1.get(leftIndex) + list2.get(rightIndex);
+			
+			if(sum == s) {
+//				long leftCount = 1;
+//				long rightCount = 1;
+//				leftIndex++;
+//				rightIndex++;
+				
+				long leftCount = 0;
+				long rightCount = 0;
+				
+//				while(leftIndex<list1Size && list1.get(leftIndex)==list1.get(leftIndex-1)) {
+				while(leftIndex<list1Size && leftSum==list1.get(leftIndex)) {
+					leftCount++;
+					leftIndex++;
+				}
+//				while(rightIndex<list2Size && list2.get(rightIndex)==list2.get(rightIndex-1)) {
+				while(rightIndex<list2Size && rightSum==list2.get(rightIndex)) {
+					rightCount++;
+					rightIndex++;
+				}
+				
+				System.out.println(leftCount);
+				System.out.println(rightCount);
+				
+				count += leftCount*rightCount;
+			}else if(sum < s) {
+				leftIndex++;
+			}else {
+				rightIndex++;
+			}
+		}*/
+		
+		if(s == 0) {
+			System.out.println(count-1);
+		}else {
+			System.out.println(count);
+		}
 	}
-
 }
+
+
+
+// 정답 코드
+/*import java.util.*;
+
+public class Main {
+    public static void main(String args[]) {
+        Scanner sc = new Scanner(System.in);
+        int n = sc.nextInt();
+        int s = sc.nextInt();
+        int[] a = new int[n];
+        for (int i=0; i<n; i++) {
+            a[i] = sc.nextInt();
+        }
+        int m = n/2;
+        n = n-m;
+        int[] first = new int[1<<n];
+        for (int i=0; i<(1<<n); i++) {
+            for (int k=0; k<n; k++) {
+                if ((i&(1<<k)) == (1<<k)) {
+                    first[i] += a[k];
+                }
+            }
+        }
+        int[] second = new int[1<<m];
+        for (int i=0; i<(1<<m); i++) {
+            for (int k=0; k<m; k++) {
+                if ((i&(1<<k)) == (1<<k)) {
+                    second[i] += a[k+n];
+                }
+            }
+        }
+        Arrays.sort(first);
+        Arrays.sort(second);
+        n = (1<<n);
+        m = (1<<m);
+        for (int i=0; i<m/2; i++) {
+            int temp = second[i];
+            second[i] = second[m-i-1];
+            second[m-i-1] = temp;
+        }
+        int i = 0;
+        int j = 0;
+        long ans = 0;
+        while (i < n && j < m) {
+            if (first[i] + second[j] == s) {
+                long c1 = 1;
+                long c2 = 1;
+                i += 1;
+                j += 1;
+                while (i < n && first[i] == first[i-1]) {
+                    c1 += 1;
+                    i += 1;
+                }
+                while (j < m && second[j] == second[j-1]) {
+                    c2 += 1;
+                    j += 1;
+                }
+                ans += c1*c2;
+            } else if (first[i] + second[j] < s) {
+                i += 1;
+            } else {
+                j += 1;
+            }
+        }
+        if (s == 0) ans -= 1;
+
+        System.out.println(ans);
+    }
+}*/
