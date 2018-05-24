@@ -98,27 +98,27 @@ public class P2143 {
 		long count = 0;
 		
 		while(leftIndex<list1Size && rightIndex<list2Size) {
-			int leftSum = list1.get(leftIndex);
-			int rightSum = list2.get(rightIndex);
+//			int leftSum = list1.get(leftIndex);
+//			int rightSum = list2.get(rightIndex);
 					
 			int sum = list1.get(leftIndex) + list2.get(rightIndex);
 			
 			if(sum == t) {
-//				long leftCount = 1;
-//				long rightCount = 1;
-//				leftIndex++;
-//				rightIndex++;
+				long leftCount = 1;
+				long rightCount = 1;
+				leftIndex++;
+				rightIndex++;
 				
-				long leftCount = 0;
-				long rightCount = 0;
+//				long leftCount = 0;
+//				long rightCount = 0;
 				
-//				while(leftIndex<list1Size && list1.get(leftIndex)==list1.get(leftIndex-1)) {
-				while(leftIndex<list1Size && leftSum==list1.get(leftIndex)) {
+				while(leftIndex<list1Size && list1.get(leftIndex).intValue()==list1.get(leftIndex-1).intValue()) {
+//				while(leftIndex<list1Size && leftSum==list1.get(leftIndex)) {
 					leftCount++;
 					leftIndex++;
 				}
-//				while(rightIndex<list2Size && list2.get(rightIndex)==list2.get(rightIndex-1)) {
-				while(rightIndex<list2Size && rightSum==list2.get(rightIndex)) {
+				while(rightIndex<list2Size && list2.get(rightIndex).intValue()==list2.get(rightIndex-1).intValue()) {
+//				while(rightIndex<list2Size && rightSum==list2.get(rightIndex)) {
 					rightCount++;
 					rightIndex++;
 				}
