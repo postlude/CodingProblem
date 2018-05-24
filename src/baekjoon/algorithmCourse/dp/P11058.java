@@ -60,7 +60,7 @@ import java.util.Scanner;
  * D[n] = max(D[n-1]+1, D[n-(j+2)] * (j+1)) (1 <= j <= n-3)
  */
 public class P11058 {
-	static int[] MAX_A = new int[101];
+	static long[] MAX_A = new long[101];
 	
 	public static void main(String[] args) {
 		Scanner scan = new Scanner(System.in);
@@ -71,23 +71,23 @@ public class P11058 {
 		System.out.println(p11058.calcMaxA(n));
 	}
 
-	public int calcMaxA(int n) {
+	public long calcMaxA(int n) {
 		P11058.MAX_A[0] = 0;
 		P11058.MAX_A[1] = 1;
 		P11058.MAX_A[2] = 2;
 		P11058.MAX_A[3] = 3;
 		
 		for(int index=4; index<=n; index++) {
-			ArrayList<Integer> numOfA = new ArrayList<>();
+			ArrayList<Long> numOfA = new ArrayList<>();
 			numOfA.add(P11058.MAX_A[index-1] + 1);
 			
 			for(int cvPress=1; cvPress<=index-3; cvPress++) {
-				int num = P11058.MAX_A[index-(cvPress+2)] * (cvPress+1);
+				long num = P11058.MAX_A[index-(cvPress+2)] * (cvPress+1);
 				numOfA.add(num);
 			}
 			
-			int maxNum = -1;
-			for(int numA : numOfA) {
+			long maxNum = -1;
+			for(long numA : numOfA) {
 				if(numA > maxNum) {
 					maxNum = numA;
 				}
@@ -98,5 +98,27 @@ public class P11058 {
 		
 		return P11058.MAX_A[n];
 	}
-	
 }
+
+
+
+// 정답 코드
+/*import java.util.*;
+
+public class Main {
+    public static void main(String args[]) {
+        Scanner sc = new Scanner(System.in);
+        int n = sc.nextInt();
+        long[] d = new long[n+1];
+        for (int i=1; i<=n; i++) {
+            d[i] = d[i-1] + 1;
+            for (int j=1; j<=i-3; j++) {
+                long cur = d[i-j-2]*(j+1);
+                if (cur > d[i]) {
+                    d[i] = cur;
+                }
+            }
+        }
+        System.out.println(d[n]);
+    }
+}*/
