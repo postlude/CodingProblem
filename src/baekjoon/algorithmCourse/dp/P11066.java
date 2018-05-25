@@ -1,7 +1,5 @@
 package baekjoon.algorithmCourse.dp;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Scanner;
 
 /**
@@ -37,32 +35,117 @@ import java.util.Scanner;
  * 300
  * 864
  */
+/*
+ * 연속된 쳅터만 합치는 게 가능
+ * 크게 2개로 나누어서 생각하고 그 부분을 또 다시 나눈다.
+ * 
+ * k = 4일 경우
+ * 1, 2, 3, 4 를 나누는 방법
+ * (1) / (2, 3, 4)
+ * (1, 2) / (3, 4)
+ * (1, 2, 3) / (4)
+ * 
+ * 첫 번째 경우에서 (2, 3, 4)는 다시
+ * (2), / (3, 4)
+ * (2, 3) / (4)
+ * 
+ * (1) / (2, 3, 4) 로 나누어 계산하는 방법에서
+ * (1) 을 합치는 최소 비용 + (2, 3, 4) 를 합치는 최소 비용 = 이 방법의 최소 비용
+ * 
+ * D[i][j] : i부터 j를 합치는 최소 비용
+ * D[i][j] = D[i][k] + D[k+1][j] + sum(i~j) (i <= k < j)
+ * i~j까지의 합을 더하는 이유 : 최종적으로 D[i][k] + D[k+1][j] 를 더한 결과 값(비용)을 더해줘야 함
+ */
 public class P11066 {
-
+	static int[][] SUM_COST;
+	
 	public static void main(String[] args) {
 		Scanner scan = new Scanner(System.in);
 		int t = scan.nextInt();
 		
+		P11066 p11066 = new P11066();
+		
 		for(int testCase=0; testCase<t; testCase++) {
 			int k = scan.nextInt();
+			P11066.SUM_COST = new int[k+1][k+1];
 			
-			int[] page = new int[k];
-			for(int pageIndex=0; pageIndex<k; pageIndex++) {
-				page[pageIndex] = scan.nextInt();
+			int[] chapterSize = new int[k+1];
+			for(int index=1; index<=k; index++) {
+				chapterSize[index] = scan.nextInt();
 			}
-			
-			Arrays.sort(page);
-			int totalCost = 0;
-			if(k%2 != 0) {
-				totalCost += page[k/2+1];
-			}
-			for(int index=0; index<k/2; index++) {
-				totalCost += page[index] + page[k-index-1];
-			}
-			
-			System.out.println(totalCost);
+			System.out.println(p11066.calcSumCost(chapterSize, 1, k));
 		}
 		scan.close();
 	}
 
+	public int calcSumCost(int[] chapterSize, int startChapter, int endChapter) {
+		if(startChapter == endChapter) {
+			return 0;
+		}
+		if(P11066.SUM_COST[startChapter][endChapter] != 0) {
+			return P11066.SUM_COST[startChapter][endChapter];
+		}
+
+		int totalSum = 0;
+		for(int index=startChapter; index<=endChapter; index++) {
+			totalSum += chapterSize[index];
+		}
+		
+		int minCost = Integer.MAX_VALUE;
+		for(int index=startChapter; index<endChapter; index++) {
+			int cost = calcSumCost(chapterSize, startChapter, index) + calcSumCost(chapterSize, index+1, endChapter) + totalSum;
+			
+			if(cost < minCost) {
+				minCost = cost;
+			}
+		}
+		P11066.SUM_COST[startChapter][endChapter] = minCost;
+		return minCost;
+	}
 }
+
+
+// 정답 코드
+/*import java.util.*;
+import java.io.*;
+public class Main {
+    static int[] a;
+    static int[][] d;
+    public static int go(int i, int j) {
+        if (i == j) {
+            return 0;
+        }
+        if (d[i][j] != -1) {
+            return d[i][j];
+        }
+        int ans = -1;
+        int sum = 0;
+        for (int k=i; k<=j; k++) {
+            sum += a[k];
+        }
+        for (int k=i; k<=j-1; k++) {
+            int temp = go(i, k) + go(k+1, j) + sum;
+            if (ans == -1 || ans > temp) {
+                ans = temp;
+            }
+        }
+        d[i][j] = ans;
+        return ans;
+    }
+    public static void main(String args[]) throws IOException {
+        BufferedReader bf = new BufferedReader(new InputStreamReader(System.in));
+        int t = Integer.valueOf(bf.readLine());
+        while (t-- > 0) {
+            int n = Integer.valueOf(bf.readLine());
+            String[] nums = bf.readLine().split(" ");
+            a = new int[n+1];
+            d = new int[n+1][n+1];
+            for (int i=1; i<=n; i++) {
+                a[i] = Integer.valueOf(nums[i-1]);
+                Arrays.fill(d[i], -1);
+            }
+            System.out.println(go(1, n));
+        }
+    }
+}
+*/
