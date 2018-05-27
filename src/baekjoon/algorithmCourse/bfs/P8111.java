@@ -83,8 +83,13 @@ public class P8111 {
 			Arrays.fill(from, -1);
 			
 			queue.add(1);
-			modAry[1] = 1;
-			count[1] = 0;
+			if(num != 1) {
+				modAry[1] = 1;
+				count[1] = 0;
+			}else {
+				modAry[0] = 1;
+				count[0] = 0;
+			}
 			
 			while(!queue.isEmpty()) {
 				int nowMod = queue.remove();
@@ -100,8 +105,6 @@ public class P8111 {
 					}
 				}
 			}
-			
-			System.out.println(Arrays.toString(from));
 			
 			if(count[0] == -1) {
 				System.out.println("BRAK");
