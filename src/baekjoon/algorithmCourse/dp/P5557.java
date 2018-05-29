@@ -1,4 +1,4 @@
-package baekjoon.algorithmCourse.etc;
+package baekjoon.algorithmCourse.dp;
 
 import java.util.Scanner;
 
