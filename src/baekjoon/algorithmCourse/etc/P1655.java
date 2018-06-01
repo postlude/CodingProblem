@@ -1,10 +1,8 @@
 package baekjoon.algorithmCourse.etc;
 
-import java.util.Iterator;
+import java.util.Comparator;
+import java.util.PriorityQueue;
 import java.util.Scanner;
-import java.util.SortedMap;
-import java.util.SortedSet;
-import java.util.TreeMap;
 
 /**
  * 가운데를 말해요
@@ -43,24 +41,99 @@ import java.util.TreeMap;
  * 2
  * 5
  */
+/*
+ * 두 개의 정렬된 큐를 사용
+ * 전체 개수가 홀수일 경우 왼쪽에 넣음
+ * 
+ * 가운데 수는 왼쪽 큐의 가장 큰 값이므로 왼쪽 큐는 역순 정렬
+ */
 public class P1655 {
-
+	// 역순 정렬을 위해 사용하는 클래스
+	class QueueComparator implements Comparator<Integer>{
+		@Override
+		public int compare(Integer num1, Integer num2) {
+			return num2.compareTo(num1);
+		}
+	}
+	
 	public static void main(String[] args) {
 		Scanner scan = new Scanner(System.in);
-//		int n = scan.nextInt();
+		int n = scan.nextInt();
 		
-		TreeMap<Integer, Integer> treeMap = new TreeMap<>();
+		P1655 p1655 = new P1655();
+		QueueComparator comparator = p1655.new QueueComparator();
 		
-		treeMap.put(3, 2);
-		treeMap.put(2, 10);
-		treeMap.put(4, 8);
-		treeMap.put(1, 1);
+		PriorityQueue<Integer> leftQueue = new PriorityQueue<>(1, comparator);
+		PriorityQueue<Integer> rightQueue = new PriorityQueue<>();
 		
-		Iterator<Integer> iter = treeMap.keySet().iterator();
-		while(iter.hasNext()) {
-			System.out.println(treeMap.get(iter.next()));
+		for(int count=0; count<n; count++) {
+			int inputNum = scan.nextInt();
+			
+			if(leftQueue.isEmpty() || rightQueue.isEmpty()) {
+				leftQueue.add(inputNum);
+			}else {
+				if(inputNum <= leftQueue.peek()) {
+					leftQueue.add(inputNum);
+				}else if(inputNum >= rightQueue.peek()) {
+					rightQueue.add(inputNum);
+				}else {
+					leftQueue.add(inputNum);
+				}
+			}
+			
+			if(leftQueue.size() > rightQueue.size()+1) {
+				rightQueue.add(leftQueue.remove());
+			}else if(rightQueue.size() > leftQueue.size()) {
+				leftQueue.add(rightQueue.remove());
+			}
+			System.out.println(leftQueue.peek());
 		}
 		scan.close();
 	}
-
 }
+
+
+
+// 정답 코드
+/*import java.util.*;
+public class Main {
+    static class Compare implements Comparator<Integer> {
+        public int compare(Integer one, Integer two) {
+            return two.compareTo(one);
+        }
+    }
+    public static void main(String args[]) {
+        Scanner sc = new Scanner(System.in);
+        Compare cmp = new Compare();
+        PriorityQueue<Integer> l = new PriorityQueue<Integer>(1, cmp);
+        PriorityQueue<Integer> r = new PriorityQueue<>();
+        int n = sc.nextInt();
+        while (n-- > 0) {
+            int x = sc.nextInt();
+
+            if (l.isEmpty() || r.isEmpty()) {
+                l.add(x);
+            } else {
+                if (x <= l.peek()) {
+                    l.add(x);
+                } else if (x >= r.peek()) {
+                    r.add(x);
+                } else {
+                    l.add(x);
+                }
+            }
+            while (!(l.size() == r.size() || l.size() == r.size() + 1)) {
+                if (l.size() > r.size()) {
+                    r.add(l.peek());
+                    l.poll();
+                } else {
+                    l.add(r.peek());
+                    r.poll();
+                }
+            }
+
+            System.out.println(l.peek());
+        }
+
+    }
+}*/
